@@ -197,11 +197,6 @@ definitions:
         description: |
           Логин пользователя (Уникальное поле)
         example: j.sparrow
-      password:
-        type: string
-        format: varchar
-        description: Пароль пользователя.
-        example: qwerty1234
       game_count:
         type: number
         format: integer
