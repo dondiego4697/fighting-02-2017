@@ -10,7 +10,11 @@ import java.util.Formatter;
  */
 public class Encrypt {
 
-    private String encryptPassword(String password)
+    public Encrypt(){
+
+    }
+
+    public String get(String password)
     {
         String sha1 = "";
         try {

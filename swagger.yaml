@@ -1,0 +1,344 @@
+swagger: '2.0'
+info:
+  title: Java Back-end
+  description: |
+    Игровой сервер для игры StepFight
+  version: "0.1.0"
+schemes:
+- http
+- https
+basePath: /api
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /api/user/login:
+    post:
+      summary: Авторизация пользователя
+      description: |
+        Авторизация зарегистрированного пользователя.
+      parameters:
+      - name: user
+        in: body
+        description: Данные пользователя (login и password).
+        required: true
+        schema:
+          $ref: '#/definitions/UserLoginInfo'
+      responses:
+        200:
+          description: |
+            Успешный вход.
+          schema:
+            $ref: '#/definitions/User'
+        404:
+          description: 
+            Пользователь не найден.
+  /api/user/signup:
+    post:
+      summary: Регистрация пользователя
+      description: |
+        Регистрация нового пользователя.
+      operationId: userCreate
+      parameters:
+      - name: user
+        in: body
+        description: Данные пользователя (login и password).
+        required: true
+        schema:
+          $ref: '#/definitions/UserLoginInfo'
+      responses:
+        200:
+          description: |
+            Успешная регистрация.
+          schema:
+            $ref: '#/definitions/SuccessOperation'
+        403:
+          description: 
+            Не удалось зарегистрировать пользователя.
+          schema:
+            $ref: '#/definitions/UnSuccessEnter'
+  /api/user/get:
+    get:
+      summary: Получение пользователя текущей сессии
+      description: |
+        Получение пользователя текущей сессии
+      responses:
+        200:
+          description: |
+            Успешная операция
+          schema:
+            $ref: '#/definitions/User'
+        401:
+          description: |
+            Пользователя с таким ключем нет в сессии
+          schema:
+            $ref: '#/definitions/UnSuccessEnter'
+        403:
+          description: 
+            Не удалось зарегистрировать пользователя.
+          schema:
+            $ref: '#/definitions/UnSuccessEnter'
+  /api/user/update:
+    post:
+      summary: Обновление логина пользователя
+      description: |
+        Обновление логина пользователя в БД
+      parameters:
+      - name: login
+        in: body
+        description: Данные пользователя (login и newlogin).
+        required: true
+        schema:
+          $ref: '#/definitions/UserNewLogin'
+      responses:
+        200:
+          description: |
+            Успешная операция
+          schema:
+            $ref: '#/definitions/SuccessOperation'
+        401:
+          description: |
+            Пользователя с таким ключем нет в сессии
+          schema:
+            $ref: '#/definitions/UnSuccessEnter'
+        400:
+          description: 
+            Запрос не понят
+          schema:
+            $ref: '#/definitions/UnSuccessEnter'
+  /api/user/updateInfo:
+    post:
+      summary: Обновление информации о пользователе
+      description: |
+        Обновление информации о пользователе в БД
+      parameters:
+      - name: user
+        in: body
+        description: Новые данные пользователя.
+        required: true
+        schema:
+          $ref: '#/definitions/UserNewInfo'
+      responses:
+        200:
+          description: |
+            Успешная операция
+          schema:
+            $ref: '#/definitions/SuccessOperation'
+        400:
+          description: 
+            Неуспешная операция
+          schema:
+            $ref: '#/definitions/UnSuccessEnter'
+  /api/user/changepass:
+    post:
+      summary: Обновление пароля пользователя
+      description: |
+        Обновление пароля пользователя в БД
+      parameters:
+      - name: user
+        in: body
+        description: Новый пароль пользователя.
+        required: true
+        schema:
+          $ref: '#/definitions/UserNewPassword'
+      responses:
+        200:
+          description: |
+            Успешная операция
+          schema:
+            $ref: '#/definitions/SuccessOperation'
+        400:
+          description: 
+            Запрос не понят
+          schema:
+            $ref: '#/definitions/UnSuccessEnter'
+        401:
+          description: 
+            Пользователя с таким ключем нет в сессии
+          schema:
+            $ref: '#/definitions/UnSuccessEnter'
+        403:
+          description: 
+            Предыдущий пароль не совпадает
+          schema:
+            $ref: '#/definitions/UnSuccessEnter'
+  /api/user/logout:
+    get:
+      summary: Логаут пользователя
+      description: |
+        Логаут пользователя
+      responses:
+        200:
+          description: |
+            Успешная операция
+          schema:
+            $ref: '#/definitions/SuccessOperation'
+        400:
+          description: 
+            Запрос не понят
+          schema:
+            $ref: '#/definitions/UnSuccessEnter'
+definitions:
+  User:
+    description: |
+      Информация о пользователе.
+    type: object
+    properties:
+      id:
+        type: number
+        readOnly: true
+        description: |
+          ID пользователя (уникальное поле).
+        example: 123
+      login:
+        type: string
+        format: varchar
+        description: |
+          Логин пользователя (Уникальное поле)
+        example: j.sparrow
+      password:
+        type: string
+        format: varchar
+        description: Пароль пользователя.
+        example: qwerty1234
+      game_count:
+        type: number
+        format: integer
+        description: Количество проведенных игр.
+        example: 10
+      game_count_win:
+        type: number
+        format: integer
+        description: Количество игр, в которых игрок одержал победу.
+        example: 7
+      crystal_green:
+        type: number
+        format: integer
+        description: Количество зеленых кристалов в коллекции игрока.
+        example: 12
+      crystal_blue:
+        type: number
+        format: integer
+        description: Количество синих кристалов в коллекции игрока.
+        example: 3
+      crystal_red:
+        type: number
+        format: integer
+        description: Количество красных кристалов в коллекции игрока.
+        example: 3
+      crystal_purple:
+        type: number
+        format: integer
+        description: Количество фиолетовых кристалов в коллекции игрока.
+        example: 5
+  UserNewInfo:
+    description: |
+      Информация о пользователе для обновления.
+    type: object
+    properties:
+      game_count:
+        type: number
+        format: integer
+        description: Количество проведенных игр.
+        example: 10
+      game_count_win:
+        type: number
+        format: integer
+        description: Количество игр, в которых игрок одержал победу.
+        example: 7
+      crystal_green:
+        type: number
+        format: integer
+        description: Количество зеленых кристалов в коллекции игрока.
+        example: 12
+      crystal_blue:
+        type: number
+        format: integer
+        description: Количество синих кристалов в коллекции игрока.
+        example: 3
+      crystal_red:
+        type: number
+        format: integer
+        description: Количество красных кристалов в коллекции игрока.
+        example: 3
+      crystal_purple:
+        type: number
+        format: integer
+        description: Количество фиолетовых кристалов в коллекции игрока.
+        example: 5
+  UserNewPassword:
+    description: |
+      Информация о пользователе для обновления.
+    type: object
+    properties:
+      login:
+        type: string
+        format: varchar
+        description: |
+          Логин пользователя (Уникальное поле)
+        example: j.sparrow
+      password:
+        type: string
+        format: varchar
+        description: Cтарый пароль пользователя.
+        example: qwerty1234
+      newpassword:
+        type: string
+        format: varchar
+        description: Новый пароль пользователя.
+        example: newpass
+  UserLoginInfo:
+    description: |
+      Информация о пользователе для логина
+    type: object
+    properties:
+      login:
+        type: string
+        format: varchar
+        description: |
+          Логин пользователя (Уникальное поле)
+        example: j.sparrow
+      password:
+        type: string
+        format: varchar
+        description: Пароль пользователя.
+        example: qwerty1234
+  UserNewLogin:
+    description: |
+      Новый логин для обновления в БД
+    type: object
+    properties:
+      login:
+        type: string
+        format: varchar
+        description: |
+          Логин пользователя (Уникальное поле)
+        example: j.sparrow
+      newlogin:
+        type: string
+        format: varchar
+        description: Новый логин пользователя.
+        example: donald
+  SuccessOperation:
+    description: |
+      Успешная операция
+    type: object
+    properties:
+      status:
+        type: string
+        format: json
+        description: |
+          Успешный логин
+        example: 200 OK
+  UnSuccessEnter:
+    description: |
+      Неуспешная операция
+    type: object
+    properties:
+      status:
+        type: string
+        format: json
+        description: |
+          Ответ сервера на неуспешный логин
+        example: 403 Forbiden
