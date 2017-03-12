@@ -19,8 +19,8 @@ import javax.servlet.http.HttpSession;
 public class UserController {
     private final UserService userService;
     private final String SESSIONKEY = "user";
-    private final String URL = "https://tp-front-end-js-game.herokuapp.com";
-    //private final String URL = "http://localhost:3000";
+    //private final String URL = "https://tp-front-end-js-game.herokuapp.com";
+    private final String URL = "http://localhost:3000";
 
     public UserController(JdbcTemplate jdbcTemplate) {
         this.userService = new UserService(jdbcTemplate);
