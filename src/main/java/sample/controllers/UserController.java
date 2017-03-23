@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import services.UserService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -20,7 +21,8 @@ public class UserController {
     private final UserService userService;
     private final String SESSIONKEY = "user";
     //private final String URL = "https://tp-front-end-js-game.herokuapp.com";
-    private final String URL = "http://localhost:3000";
+    //private final String URL = "http://localhost:63343";
+    private final String URL = "*";
 
     public UserController(JdbcTemplate jdbcTemplate) {
         this.userService = new UserService(jdbcTemplate);
@@ -50,6 +52,7 @@ public class UserController {
     @RequestMapping(path = "/signup", method = RequestMethod.POST, produces = "application/json",
             consumes = "application/json")
     public String registerUser(@RequestBody ObjUser body) {
+
         final JSONObject answer = new JSONObject();
         userService.register(body, new UserService.Callback() {
             @Override

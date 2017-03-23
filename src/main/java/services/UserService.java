@@ -38,21 +38,32 @@ public class UserService {
     }
 
     public void register(ObjUser objUser, Callback callback) {
-        try {
-            int rownum = jdbcTemplate.update(
-                    "INSERT INTO " + TABLENAME + " (login,password) VALUES(?,?)",
-                    objUser.getLogin().toLowerCase(),
-                    objUser.getPassword());
-
-            if (rownum == 0) {
-                callback.onError(new HttpStatus().getForbidden());
-            } else {
-                callback.onSuccess(new HttpStatus().getOk());
-            }
-        } catch (Exception e) {
+        if (objUser.getClearPassword().isEmpty() || objUser.getLogin().isEmpty()) {
             callback.onError(new HttpStatus().getForbidden());
+        } else if (objUser.getClearPassword().length() < 8) {
+            callback.onError(new HttpStatus().getForbidden());
+        } else if (objUser.getLogin().matches("[а-яА-ЯёЁ]+")) {
+            callback.onError(new HttpStatus().getForbidden());
+        } else if (objUser.getLogin().length() < 4) {
+            callback.onError(new HttpStatus().getForbidden());
+        } else {
+            try {
+                int rownum = jdbcTemplate.update(
+                        "INSERT INTO " + TABLENAME + " (login, password) VALUES(?,?)",
+                        objUser.getLogin().toLowerCase(),
+                        objUser.getPassword());
+
+                if (rownum == 0) {
+                    callback.onError(new HttpStatus().getForbidden());
+                } else {
+                    callback.onSuccess(new HttpStatus().getOk());
+                }
+            } catch (Exception e) {
+                callback.onError(new HttpStatus().getForbidden());
+            }
         }
     }
+
 
     public void login(ObjUser objUser, CallbackWithUser callbackWithUser) {
         String SQL = "SELECT * FROM users WHERE (login, password) = (?,?)";

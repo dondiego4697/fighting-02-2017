@@ -73,6 +73,10 @@ public class ObjUser {
         return newlogin;
     }
 
+    public String getClearPassword() {
+        return password;
+    }
+
     public String getPassword() {
         return new Encrypt().get(password);
     }
