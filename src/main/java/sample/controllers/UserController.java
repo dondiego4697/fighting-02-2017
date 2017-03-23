@@ -20,9 +20,9 @@ import javax.servlet.http.HttpSession;
 public class UserController {
     private final UserService userService;
     private final String SESSIONKEY = "user";
-    //private final String URL = "https://tp-front-end-js-game.herokuapp.com";
+    private final String URL = "https://tp-front-end-js-game.herokuapp.com";
     //private final String URL = "http://localhost:63343";
-    private final String URL = "*";
+    //private final String URL = "*";
 
     public UserController(JdbcTemplate jdbcTemplate) {
         this.userService = new UserService(jdbcTemplate);
