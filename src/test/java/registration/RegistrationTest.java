@@ -1,5 +1,7 @@
 package registration;
 
+
+import application.Application;
 import com.github.javafaker.Faker;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -12,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import sample.Application;
 
 import java.util.Locale;
 
@@ -39,12 +40,13 @@ public class RegistrationTest {
     @Before
     public void setUp() {
         faker = new Faker(new Locale("en-US"));
-        password = faker.internet().password(8, 10);
-        userLogin = faker.name().username();
     }
 
     @Test
     public void signup200() throws Exception {
+
+        password = faker.internet().password(8, 10);
+        userLogin = faker.name().username();
 
         JSONObject json = new JSONObject();
 
@@ -57,5 +59,46 @@ public class RegistrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json.toString()))
                 .andExpect(jsonPath("status").value("200 OK"));
+    }
+
+    @Test
+    public void signupShortPassword() throws Exception {
+        {
+            password = faker.internet().password(0, 7);
+            userLogin = faker.name().username();
+
+            JSONObject json = new JSONObject();
+
+            json.put("login", userLogin);
+            json.put("password", password);
+
+            mockMvc
+                    .perform(
+                            post("/api/user/signup")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(json.toString()))
+                    .andExpect(jsonPath("status").value("403 Forbidden"));
+        }
+    }
+
+    @Test
+    public void signupCirilicCharsInLogin() throws Exception {
+        {
+            password = faker.internet().password(8, 10);
+
+            userLogin = faker.name().username();
+
+            JSONObject json = new JSONObject();
+
+            json.put("login", userLogin);
+            json.put("password", password);
+
+            mockMvc
+                    .perform(
+                            post("/api/user/signup")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(json.toString()))
+                    .andExpect(jsonPath("status").value("403 Forbidden"));
+        }
     }
 }
