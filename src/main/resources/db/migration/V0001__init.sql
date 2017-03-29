@@ -1,6 +1,16 @@
-CREATE TABLE users
+-- DROP TABLE IF EXISTS users;
+-- DROP SEQUENCE IF EXISTS users_id_seq;
+
+-- CREATE SEQUENCE IF NOT EXISTS public.users_id_seq
+--     INCREMENT 1
+--     START 1
+--     MINVALUE 1
+--     MAXVALUE 9223372036854775807
+--     CACHE 1;
+
+CREATE TABLE IF NOT EXISTS users
 (
-    id INTEGER DEFAULT nextval('users_id_seq'::regclass) PRIMARY KEY NOT NULL,
+    id SERIAL PRIMARY KEY NOT NULL,
     login VARCHAR(40) NOT NULL,
     password VARCHAR(40) NOT NULL,
     game_count INTEGER DEFAULT 0,

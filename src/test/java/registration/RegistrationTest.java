@@ -31,8 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 public class RegistrationTest {
-
-
     @Autowired
     private MockMvc mockMvc;
     private Faker faker;
