@@ -1,7 +1,15 @@
 language: java
-jdk: oraclejdk8
-install: true
-script: mvn clean integration-test
-cache:
-  directories:
-  - $HOME/.m2
+jdk:
+  - oraclejdk8
+services:
+  - postgresql
+branches:       # Branches of repository that are deployed to heroku
+  only:
+  - develop     # Currently deploying only develop branch
+deploy:
+  provider: heroku
+  app:
+    develop: stepfight2017  # Maps repository branch name to heroku application name
+  api_key:
+    # Below - secure code to authorize on heroku
+    secure: I7MX1NyAEqsWs8bshjzLxRGMkpzxqQwfiRQHsu0lAnP6PBFL3zqqvr4C8fX7D3fdSeqrjNmEpZmFinHM4YT975Am2OJC4gP9LRW/0sdrhEwAIUOpUFazsf7XPVc4A7Dyf8rzvzCdWPAO8clBoAHUqcyOGZmDJFKMRqCqV1elxNE5nEKXmwSNQGlmXbwmDWg50rGRGpc1uZN2xiP9OLeXtWZ3hOy6bwfNHVB1yLWPLTm3HKkDBbUjKYkvuIV2iWOwAP9sa4MhrB0bS4FaNRFOcs+gKwGgF8pwcRo8/3rmTpj6IBo/9ltfRqEi5OabiN9/dHvhMSWK1/xENdOIET1nSaUfcMDrHvrT9nAe7layCds4fe8ToYhGWD6QAyAfb3UC+Va+M5/H8c5OE4MOyX9r/Mb8wwBskkUec6K6+pdsDuhVUVqnOb0Z9AJgI+yBpsArQ8PjkDAty2YhS2v8z6NsTtJfjebfLEPq5OIAOw7+eGelaj+OFCxXVDkNF+pCXKIo4FN9hCWlfrGZcFYzoHy4jAhfbI37WKTuF4UhvAQTHwV/n2dGNqj/BbceUY0hqAkdtNZ+t8EL/d+PrD8u8HvGzJbPmJEYjOCbkXTz+Z/hMYY9Vxm6he8O26yICvdIS5L8bmgzjeXyJ8hsmEEQMsxX94Wv1JECWmiEwrBhFxPfU5U=
