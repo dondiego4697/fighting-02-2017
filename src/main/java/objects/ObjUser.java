@@ -2,11 +2,8 @@ package objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.json.JSONException;
 import org.json.JSONObject;
 import support.Encrypt;
-
-import java.util.Objects;
 
 /**
  * Created by Denis on 21.02.2017.

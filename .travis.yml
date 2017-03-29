@@ -1,7 +1,8 @@
 language: java
 jdk:
   - oraclejdk8
-services:
+sudo: requiredgit
+applocation.services:
   - postgresql
 branches:       # Branches of repository that are deployed to heroku
   only:

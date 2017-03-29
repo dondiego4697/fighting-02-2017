@@ -1,4 +1,4 @@
-package controllers;
+package sample.controllers;
 
 import objects.HttpStatus;
 import objects.ObjUser;
@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import services.UserService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /**

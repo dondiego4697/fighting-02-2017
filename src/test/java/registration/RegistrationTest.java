@@ -1,7 +1,7 @@
 package registration;
 
 
-import application.Application;
+import sample.Application;
 import com.github.javafaker.Faker;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -32,19 +32,19 @@ public class RegistrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-    private static Faker faker;
+    private Faker faker;
 
     private String userLogin;
     private String password;
 
     @Before
     public void setUp() {
-        faker = new Faker(new Locale("en-US"));
+
     }
 
     @Test
-    public void signup200() throws Exception {
-
+    public void signupOK() throws Exception {
+        faker = new Faker(new Locale("en-US"));
         password = faker.internet().password(8, 10);
         userLogin = faker.name().username();
 
@@ -64,6 +64,7 @@ public class RegistrationTest {
     @Test
     public void signupShortPassword() throws Exception {
         {
+            faker = new Faker(new Locale("en-US"));
             password = faker.internet().password(0, 7);
             userLogin = faker.name().username();
 
@@ -84,11 +85,14 @@ public class RegistrationTest {
     @Test
     public void signupCirilicCharsInLogin() throws Exception {
         {
+
+            faker = new Faker(new Locale("ru"));
             password = faker.internet().password(8, 10);
 
-            userLogin = faker.name().username();
+            userLogin = "Чебуратор";
 
             JSONObject json = new JSONObject();
+
 
             json.put("login", userLogin);
             json.put("password", password);
