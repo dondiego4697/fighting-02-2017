@@ -62,6 +62,8 @@ public class RegistrationTest {
                 .andExpect(jsonPath("status").value("200 OK"));
     }
 
+
+
     @Test
     public void signupShortPassword() throws Exception {
         {
@@ -86,6 +88,33 @@ public class RegistrationTest {
     @Test
     public void signupCirilicCharsInLogin() throws Exception {
         {
+
+            faker = new Faker(new Locale("ru"));
+            password = faker.internet().password(8, 10);
+
+            userLogin = "Чебуратор";
+
+            JSONObject json = new JSONObject();
+
+
+            json.put("login", userLogin);
+            json.put("password", password);
+
+            mockMvc
+                    .perform(
+                            post("/api/user/signup")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(json.toString()))
+                    .andExpect(jsonPath("status").value("403 Forbidden"));
+        }
+    }
+
+    @Test
+    public void loginOK() throws Exception {
+        {
+            signupOK();
+
+
 
             faker = new Faker(new Locale("ru"));
             password = faker.internet().password(8, 10);

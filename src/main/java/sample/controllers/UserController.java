@@ -2,9 +2,11 @@ package sample.controllers;
 
 import objects.HttpStatus;
 import objects.ObjUser;
+import objects.ObjUsersData;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.bind.annotation.*;
 import services.UserService;
 
@@ -23,21 +25,22 @@ public class UserController {
     //private final String URL = "http://localhost:63343";
     //private final String URL = "*";
 
-    public UserController(JdbcTemplate jdbcTemplate) {
-        this.userService = new UserService(jdbcTemplate);
+    public UserController(JdbcTemplate jdbcTemplate,PlatformTransactionManager transactionManager) {
+        this.userService = new UserService(jdbcTemplate, transactionManager);
     }
 
     @CrossOrigin(origins = URL, maxAge = 3600)
     @RequestMapping(path = "/login", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
     public String loginUser(@RequestBody ObjUser body, HttpSession httpSession) {
         final JSONObject answer = new JSONObject();
-        userService.login(body, new UserService.CallbackWithUser() {
+        userService.login(body, new UserService.CallbackWithUser<ObjUser>() {
             @Override
             public void onSuccess(String status, ObjUser objUser) {
                 answer.put("status", status);
                 answer.put("user", objUser.getJson());
                 httpSession.setAttribute(SESSIONKEY, objUser);
             }
+
 
             @Override
             public void onError(String status) {
@@ -89,7 +92,7 @@ public class UserController {
                              HttpSession httpSession) {
         final JSONObject answer = new JSONObject();
         if (httpSession.getAttribute(SESSIONKEY) != null) {
-            userService.update(body, new UserService.CallbackWithUser() {
+            userService.update(body, new UserService.CallbackWithUser<ObjUser>() {
                 @Override
                 public void onSuccess(String status, ObjUser objUser) {
                     httpSession.removeAttribute(SESSIONKEY);
@@ -111,17 +114,17 @@ public class UserController {
     @CrossOrigin(origins = URL, maxAge = 3600)
     @RequestMapping(path = "/updateinfo", method = RequestMethod.POST, produces = "application/json",
             consumes = "application/json")
-    public String updateUserInfo(@RequestBody ObjUser body,
+    public String updateUserInfo(@RequestBody ObjUsersData body,
                                  HttpSession httpSession) {
         final JSONObject answer = new JSONObject();
         if (httpSession.getAttribute(SESSIONKEY) != null) {
-            userService.updateInfo(body, new UserService.CallbackWithUser() {
+            userService.updateInfo(body, new UserService.CallbackWithUser<ObjUsersData>() {
                 @Override
-                public void onSuccess(String status, ObjUser objUser) {
+                public void onSuccess(String status, ObjUsersData objUser) {
                     final ObjUser objUserS = (ObjUser) httpSession.getAttribute(SESSIONKEY);
                     httpSession.removeAttribute(SESSIONKEY);
-                    objUser.setId(objUserS.getId());
-                    objUser.setPassword(objUserS.getPassword());
+                   // objUser.setId(objUserS.getId());
+                   // objUser.setPassword(objUser.getPassword());
                     httpSession.setAttribute(SESSIONKEY, objUser);
                     answer.put("status", status);
                 }
@@ -143,7 +146,7 @@ public class UserController {
                                  HttpSession httpSession) {
         final JSONObject answer = new JSONObject();
         if (httpSession.getAttribute(SESSIONKEY) != null) {
-            userService.changePass(body, new UserService.CallbackWithUser() {
+            userService.changePass(body, new UserService.CallbackWithUser<ObjUser>() {
                 @Override
                 public void onSuccess(String status, ObjUser objUser) {
                     final ObjUser objUserS = (ObjUser) httpSession.getAttribute(SESSIONKEY);
