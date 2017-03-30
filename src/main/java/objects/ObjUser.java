@@ -51,7 +51,7 @@ public class ObjUser {
         return id;
     }
 
-  public String getLogin() {
+    public String getLogin() {
         return login;
     }
 
@@ -62,15 +62,15 @@ public class ObjUser {
 
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    private  Function<String,String> hash=password-> passwordEncoder.encode(password);
+    private Function<String, String> hash = password -> passwordEncoder.encode(password);
 
-    public Predicate<String> comparePass=passwordDB-> passwordEncoder.matches(getPassword(),passwordDB);
+    public Predicate<String> comparePass = passwordDB -> passwordEncoder.matches(getPassword(), passwordDB);
 
-    public String getHashPassword(){
+    public String getHashPassword() {
         return hash.apply(getPassword());
     }
 
-    public String getNewHashPassword(){
+    public String getNewHashPassword() {
         return hash.apply(getNewpassword());
     }
 
@@ -98,7 +98,10 @@ public class ObjUser {
     public void setNewlogin(String newlogin) {
         this.newlogin = newlogin;
     }
-    public void setId(int id){this.id=id;}
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public JSONObject getJson() {
         final JSONObject jsonObject = new JSONObject();

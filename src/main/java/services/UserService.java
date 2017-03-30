@@ -35,12 +35,13 @@ public class UserService /*implements  PlatformTransactionManager*/ {
         void onError(String status);
     }
 
-    public  interface CallbackWithUser<T> {
+    public interface CallbackWithUser<T> {
         void onSuccess(String status, T objUser);
+
         void onError(String status);
     }
 
-    public UserService(JdbcTemplate jdbcTemplate,PlatformTransactionManager transactionManager) {
+    public UserService(JdbcTemplate jdbcTemplate, PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -55,7 +56,7 @@ public class UserService /*implements  PlatformTransactionManager*/ {
         } else if (objUser.getLogin().length() < 4) {
             callback.onError(new HttpStatus().getForbidden());
         } else {
-        try {
+            try {
                 registerUser(objUser);
                 callback.onSuccess(new HttpStatus().getOk());
             } catch (RuntimeException e) {
@@ -65,19 +66,21 @@ public class UserService /*implements  PlatformTransactionManager*/ {
     }
 
     @Transactional
-    private void registerUser(ObjUser objUser)  {
+    private void registerUser(ObjUser objUser) {
         jdbcTemplate.update("insert into users (login,password) values (?,?);", objUser.getLogin(), objUser.getHashPassword());
         jdbcTemplate.update("INSERT INTO usersData (login) values (?);", objUser.getLogin());
     }
 
     @Transactional
-    private void updateUsers(ObjUser objUser)  {
-        jdbcTemplate.update("update users set login=? where login=?;", objUser.getNewlogin(),objUser.getLogin());
-        jdbcTemplate.update("update usersdata set login=? where login=?;", objUser.getNewlogin(),objUser.getLogin());
+    private int updateUsers(ObjUser objUser) {
+        int rowNumb = 0;
+        rowNumb = jdbcTemplate.update("update users set login=? where login=?;", objUser.getNewlogin(), objUser.getLogin());
+        rowNumb += jdbcTemplate.update("update usersdata set login=? where login=?;", objUser.getNewlogin(), objUser.getLogin());
+        return rowNumb;
     }
 
     @Transactional
-    private boolean checkINputPasAndLog(ObjUser user){
+    private boolean checkINputPasAndLog(ObjUser user) {
         String SQL = "SELECT * FROM users WHERE login = ?";
         ObjUser userDB = jdbcTemplate.queryForObject(SQL,
                 new Object[]{user.getLogin()}, new UserMapper());
@@ -86,16 +89,29 @@ public class UserService /*implements  PlatformTransactionManager*/ {
 
     public void login(ObjUser objUser, CallbackWithUser callbackWithUser) {
         try {
-           if(checkINputPasAndLog(objUser)) callbackWithUser.onSuccess(new HttpStatus().getOk(), objUser);
-           else callbackWithUser.onError(new HttpStatus().getNotFound());
-            } catch (Exception e) {
+            if (checkINputPasAndLog(objUser)) callbackWithUser.onSuccess(new HttpStatus().getOk(), objUser);
+            else callbackWithUser.onError(new HttpStatus().getNotFound());
+        } catch (Exception e) {
+            callbackWithUser.onError(new HttpStatus().getNotFound());
+        }
+    }
+
+    public void getUser(String login, CallbackWithUser callbackWithUser) {
+        try {
+            String SQL = "SELECT * FROM users WHERE login = ?";
+            ObjUser userDB = jdbcTemplate.queryForObject(SQL,
+                    new Object[]{login}, new UserMapper());
+            callbackWithUser.onSuccess(new HttpStatus().getOk(), userDB);
+        }
+        catch (Exception e){
             callbackWithUser.onError(new HttpStatus().getNotFound());
         }
     }
 
     public void update(ObjUser newObjUser, CallbackWithUser callbackWithUser) {
         try {
-            updateUsers(newObjUser);
+            int rowNum = updateUsers(newObjUser);
+            if (rowNum == 0) throw new Exception();
             callbackWithUser.onSuccess(new HttpStatus().getOk(), newObjUser);
 
         } catch (Exception e) {
@@ -132,7 +148,7 @@ public class UserService /*implements  PlatformTransactionManager*/ {
     public void changePass(ObjUser objUser, CallbackWithUser callbackWithUser) {
 
         try {
-            if(!checkINputPasAndLog(objUser)) {
+            if (!checkINputPasAndLog(objUser)) {
                 callbackWithUser.onError(new HttpStatus().getNotFound());
                 return;
             }
@@ -143,7 +159,7 @@ public class UserService /*implements  PlatformTransactionManager*/ {
         String SQL = "UPDATE users SET password= ? where login=?";
         try {
             int rownum = jdbcTemplate.update(
-                    SQL, objUser.getNewHashPassword(),objUser.getLogin());
+                    SQL, objUser.getNewHashPassword(), objUser.getLogin());
 
             if (rownum == 0) {
                 callbackWithUser.onError(new HttpStatus().getBadRequest());
@@ -158,7 +174,7 @@ public class UserService /*implements  PlatformTransactionManager*/ {
     public JSONArray getLeaders() {
         final JSONArray jsonArray = new JSONArray();
         String SQL = "SELECT login, rating FROM usersdata ORDER BY rating DESC LIMIT 20";
-        List<ObjUsersData> users = jdbcTemplate.query(SQL, new RowMapper<ObjUsersData>(){
+        List<ObjUsersData> users = jdbcTemplate.query(SQL, new RowMapper<ObjUsersData>() {
             @Override
             public ObjUsersData mapRow(ResultSet rs, int rownumber) throws SQLException {
                 ObjUsersData objUsersData = new ObjUsersData();
@@ -166,7 +182,7 @@ public class UserService /*implements  PlatformTransactionManager*/ {
                 objUsersData.setRating(rs.getInt("rating"));
                 return objUsersData;
             }
-            });
+        });
         for (ObjUsersData user : users) {
             jsonArray.put(user.getJson());
         }

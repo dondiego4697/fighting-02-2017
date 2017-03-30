@@ -38,7 +38,7 @@ public class UserController {
             public void onSuccess(String status, ObjUser objUser) {
                 answer.put("status", status);
                 answer.put("user", objUser.getJson());
-                httpSession.setAttribute(SESSIONKEY, objUser);
+                httpSession.setAttribute(SESSIONKEY, objUser.getLogin());
             }
 
 
@@ -75,13 +75,26 @@ public class UserController {
     public String getUser(HttpSession httpSession) {
 
         final JSONObject answer = new JSONObject();
-        final ObjUser objUser = (ObjUser) httpSession.getAttribute(SESSIONKEY);
-        if (objUser != null) {
-            answer.put("status", new HttpStatus().getOk());
-            answer.put("user", objUser.getJson());
-        } else {
-            answer.put("status", new HttpStatus().getUnauthorized());
-        }
+        //final ObjUser objUser = (ObjUser) httpSession.getAttribute(SESSIONKEY);
+        final String login=(String) httpSession.getAttribute(SESSIONKEY);
+        userService.getUser(login, new UserService.CallbackWithUser<ObjUser>() {
+            @Override
+            public void onSuccess(String status, ObjUser objUser) {
+
+                answer.put("status", status);
+                if (objUser != null) {
+                    answer.put("status", new HttpStatus().getOk());
+                    answer.put("user", objUser.getJson());
+                } else {
+                    answer.put("status", new HttpStatus().getUnauthorized());
+                }
+            }
+            @Override
+            public void onError(String status){
+                answer.put("status", status);
+            }
+
+        });
         return answer.toString();
     }
 
@@ -96,7 +109,7 @@ public class UserController {
                 @Override
                 public void onSuccess(String status, ObjUser objUser) {
                     httpSession.removeAttribute(SESSIONKEY);
-                    httpSession.setAttribute(SESSIONKEY, objUser);
+                    httpSession.setAttribute(SESSIONKEY, objUser.getLogin());
                     answer.put("status", status);
                 }
 
@@ -121,11 +134,11 @@ public class UserController {
             userService.updateInfo(body, new UserService.CallbackWithUser<ObjUsersData>() {
                 @Override
                 public void onSuccess(String status, ObjUsersData objUser) {
-                    final ObjUser objUserS = (ObjUser) httpSession.getAttribute(SESSIONKEY);
+                    final String login = (String) httpSession.getAttribute(SESSIONKEY);
                     httpSession.removeAttribute(SESSIONKEY);
                    // objUser.setId(objUserS.getId());
                    // objUser.setPassword(objUser.getPassword());
-                    httpSession.setAttribute(SESSIONKEY, objUser);
+                    httpSession.setAttribute(SESSIONKEY, objUser.getLogin());
                     answer.put("status", status);
                 }
 
@@ -149,10 +162,10 @@ public class UserController {
             userService.changePass(body, new UserService.CallbackWithUser<ObjUser>() {
                 @Override
                 public void onSuccess(String status, ObjUser objUser) {
-                    final ObjUser objUserS = (ObjUser) httpSession.getAttribute(SESSIONKEY);
+                    final String login = (String) httpSession.getAttribute(SESSIONKEY);
                     httpSession.removeAttribute(SESSIONKEY);
-                    objUserS.setPassword(objUser.getNewpassword());
-                    httpSession.setAttribute(SESSIONKEY, objUserS);
+//                    objUserS.setPassword(objUser.getNewpassword());
+                    httpSession.setAttribute(SESSIONKEY, login);
                     answer.put("status", status);
                 }
 
