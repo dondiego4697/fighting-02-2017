@@ -1,5 +1,6 @@
 package tests.update;
 
+import application.Application;
 import com.github.javafaker.Faker;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -14,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import application.Application;
 
 import java.util.Locale;
 
@@ -63,10 +63,62 @@ public class UpdateUserInfo {
         mockMvc
                 .perform(
                         post("/api/user/login")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(json.toString()))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json.toString()))
                 .andExpect(jsonPath("status").value("200 OK"));
 
+        json.put("login", userLogin);
+        json.put("rating", 5);
+        json.put("game_count", 10);
+        json.put("game_count_win", 5);
+        json.put("crystal_green", 10);
+        json.put("crystal_blue", 10);
+        json.put("crystal_red", 12);
+        json.put("crystal_purple", 12);
+
+        mockMvc.
+                perform(
+                        post("/api/user/updateinfo")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json.toString())
+                                .sessionAttr("user", userLogin))
+                .andExpect(jsonPath("status").value("200 OK"));
+
+    }
+
+    @Test
+    public void updateUserInfoFail() throws Exception {
+
+        mockMvc
+                .perform(
+                        post("/api/user/signup")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json.toString()))
+                .andExpect(jsonPath("status").value("200 OK"));
+
+        mockMvc
+                .perform(
+                        post("/api/user/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json.toString()))
+                .andExpect(jsonPath("status").value("200 OK"));
+
+        json.put("login", userLogin+"lorem");
+        json.put("rating", 5);
+        json.put("game_count", 10);
+        json.put("game_count_win", 5);
+        json.put("crystal_green", 10);
+        json.put("crystal_blue", 10);
+        json.put("crystal_red", 12);
+        json.put("crystal_purple", 12);
+
+        mockMvc.
+                perform(
+                        post("/api/user/updateinfo")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json.toString())
+                                .sessionAttr("user", userLogin))
+                .andExpect(jsonPath("status").value("400 Bad Request"));
 
     }
 
