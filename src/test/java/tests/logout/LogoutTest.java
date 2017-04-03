@@ -1,4 +1,4 @@
-package tests.login;
+package tests.logout;
 
 import application.Application;
 import com.github.javafaker.Faker;
@@ -19,17 +19,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Locale;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
- * Created by egor on 30.03.17.
+ * Created by egor on 03.04.17.
  */
 
 @SpringBootTest(classes = Application.class)
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-public class LoginTest {
+public class LogoutTest {
     @Autowired
     private MockMvc mockMvc;
     private Faker faker;
@@ -37,20 +38,21 @@ public class LoginTest {
     private String userLogin;
     private String password;
 
+    private JSONObject json;
+
     @Before
     public void setUp() {
         faker = new Faker(new Locale("en-US"));
         password = faker.internet().password(8, 10);
         userLogin = faker.name().username();
-    }
-
-    @Test
-    public void loginOk() throws Exception {
-
-        JSONObject json = new JSONObject();
+        json = new JSONObject();
 
         json.put("login", userLogin);
         json.put("password", password);
+    }
+
+    @Test
+    public void logoutOk() throws Exception {
 
         mockMvc
                 .perform(
@@ -63,20 +65,22 @@ public class LoginTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.toString()))
                 .andExpect(jsonPath("status").value("200 OK"));
+
+        mockMvc.perform(get("/api/user/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.toString())
+                .sessionAttr("user", userLogin))
+                .andExpect(jsonPath("status").value("200 OK"));
     }
 
     @Test
-    public void loginFail() throws Exception {
+    public void logoutFail() throws Exception {
 
-        JSONObject json = new JSONObject();
+        json.put("login", userLogin+"lorem");
 
-        json.put("login", userLogin);
-        json.put("password", password);
-
-        mockMvc.perform(post("/api/user/login")
+        mockMvc.perform(get("/api/user/logout")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.toString()))
-                .andExpect(jsonPath("status").value("404 Not Found"));
+                .andExpect(jsonPath("status").value("400 Bad Request"));
     }
-
 }
