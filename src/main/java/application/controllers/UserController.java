@@ -1,14 +1,14 @@
-package sample.controllers;
+package application.controllers;
 
-import objects.HttpStatus;
-import objects.ObjUser;
-import objects.ObjUsersData;
+import application.objects.HttpStatus;
+import application.objects.ObjUser;
+import application.objects.ObjUsersData;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.bind.annotation.*;
-import services.UserService;
+import application.services.UserService;
 
 import javax.servlet.http.HttpSession;
 
@@ -70,6 +70,7 @@ public class UserController {
         return answer.toString();
     }
 
+
     @CrossOrigin(origins = URL, maxAge = 3600)
     @RequestMapping(path = "/get", method = RequestMethod.GET, produces = "application/json")
     public String getUser(HttpSession httpSession) {
@@ -124,6 +125,13 @@ public class UserController {
         return answer.toString();
     }
 
+    /**
+     * Обновление информации юзера после боя
+     *
+     * @param body
+     * @param httpSession
+     * @return
+     */
     @CrossOrigin(origins = URL, maxAge = 3600)
     @RequestMapping(path = "/updateinfo", method = RequestMethod.POST, produces = "application/json",
             consumes = "application/json")

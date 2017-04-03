@@ -1,8 +1,9 @@
-package services;
+package application.services;
 
-import objects.HttpStatus;
-import objects.ObjUser;
-import objects.ObjUsersData;
+import application.objects.HttpStatus;
+import application.objects.ObjUser;
+import application.objects.ObjUsersData;
+import application.services.mappers.UserMapper;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,7 +11,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
-import services.mappers.UserMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,6 +40,7 @@ public class UserService /*implements  PlatformTransactionManager*/ {
 
         void onError(String status);
     }
+
 
     public UserService(JdbcTemplate jdbcTemplate, PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;

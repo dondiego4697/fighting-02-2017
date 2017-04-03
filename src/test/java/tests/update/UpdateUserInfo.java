@@ -1,4 +1,4 @@
-package login;
+package tests.update;
 
 import com.github.javafaker.Faker;
 import org.json.JSONObject;
@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import sample.Application;
+import application.Application;
 
 import java.util.Locale;
 
@@ -22,14 +22,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
- * Created by egor on 30.03.17.
+ * Created by egor on 31.03.17.
  */
 
 @SpringBootTest(classes = Application.class)
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-public class LoginTest {
+public class UpdateUserInfo {
+
     @Autowired
     private MockMvc mockMvc;
     private Faker faker;
@@ -37,20 +38,20 @@ public class LoginTest {
     private String userLogin;
     private String password;
 
+    private JSONObject json = new JSONObject();
+
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         faker = new Faker(new Locale("en-US"));
         password = faker.internet().password(8, 10);
         userLogin = faker.name().username();
+        json.put("login", userLogin);
+        json.put("password", password);
+
     }
 
     @Test
-    public void loginOK() throws Exception {
-
-        JSONObject json = new JSONObject();
-
-        json.put("login", userLogin);
-        json.put("password", password);
+    public void updateUserInfoOk() throws Exception {
 
         mockMvc
                 .perform(
@@ -59,23 +60,15 @@ public class LoginTest {
                                 .content(json.toString()))
                 .andExpect(jsonPath("status").value("200 OK"));
 
-        mockMvc.perform(post("/api/user/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json.toString()))
+        mockMvc
+                .perform(
+                        post("/api/user/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(json.toString()))
                 .andExpect(jsonPath("status").value("200 OK"));
+
+
     }
 
-    @Test
-    public void loginFail() throws Exception {
 
-        JSONObject json = new JSONObject();
-
-        json.put("login", userLogin);
-        json.put("password", password);
-
-        mockMvc.perform(post("/api/user/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json.toString()))
-                .andExpect(jsonPath("status").value("404 Not Found"));
-    }
 }

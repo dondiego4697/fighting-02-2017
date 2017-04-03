@@ -1,4 +1,4 @@
-package update;
+package tests.update;
 
 import com.github.javafaker.Faker;
 import org.json.JSONObject;
@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import sample.Application;
+import application.Application;
 
 import java.util.Locale;
 
@@ -29,8 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-public class UpdateLoginTest {
-
+public class UpdatePasswordTest {
     @Autowired
     private MockMvc mockMvc;
     private Faker faker;
@@ -45,76 +44,37 @@ public class UpdateLoginTest {
         faker = new Faker(new Locale("en-US"));
         password = faker.internet().password(8, 10);
         userLogin = faker.name().username();
-
-
         json.put("login", userLogin);
         json.put("password", password);
-
-//        mockMvc
-//                .perform(
-//                        post("/api/user/signup")
-//                                .contentType(MediaType.APPLICATION_JSON)
-//                                .content(json.toString()))
-//                .andExpect(jsonPath("status").value("200 OK"));
-//
-//        mockMvc.perform(post("/api/user/login")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(json.toString()))
-//                .andExpect(jsonPath("status").value("200 OK"));
-
-
     }
 
     @Test
-    public void updateLoginOk() throws Exception {
+    public void updatePasswordOK() throws Exception {
 
-        mockMvc     //лестница Егорки
+
+
+        json.put("newpassword", faker.internet().password(8, 10));
+
+        mockMvc
                 .perform(
                         post("/api/user/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json.toString()))
                 .andExpect(jsonPath("status").value("200 OK"));
 
-       // ObjUser objuser = new ObjUser();
-       // objuser.setLogin(userLogin);
-
         mockMvc.perform(post("/api/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.toString()))
                 .andExpect(jsonPath("status").value("200 OK"));
 
-
-        String oldLogin = (String) json.get("login");
-        json.put("newlogin", faker.name().username());
-//        JSONObject newJson = new JSONObject();
-//
-//        newJson.put("newlogin", faker.name().username());
-
         mockMvc
                 .perform(
-                        post("/api/user/update")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(json.toString())
-                .sessionAttr("user", userLogin))
-                .andExpect(jsonPath("status").value("200 OK"));
-    }
-
-    @Test
-    public void updateLoginFail() throws Exception {
-        faker = new Faker(new Locale("en-US"));
-        password = faker.internet().password(8, 10);
-        userLogin = faker.name().username();
-
-
-        json.put("login", userLogin);
-        json.put("password", password);
-        json.put("newlogin",userLogin+"1998");
-        mockMvc
-                .perform(
-                        post("/api/user/update")
+                        post("/api/user/changepass")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json.toString())
                                 .sessionAttr("user", userLogin))
-                .andExpect(jsonPath("status").value("400 Bad Request"));
+                .andExpect(jsonPath("status").value("200 OK"));
     }
+
+
 }

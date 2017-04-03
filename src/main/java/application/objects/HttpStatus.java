@@ -1,4 +1,4 @@
-package objects;
+package application.objects;
 
 /**
  * Created by Denis on 22.02.2017.

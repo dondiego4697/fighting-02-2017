@@ -1,6 +1,6 @@
-package services.mappers;
+package application.services.mappers;
 
-import objects.ObjUsersData;
+import application.objects.ObjUsersData;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
