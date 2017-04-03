@@ -22,15 +22,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
- * Created by egor on 31.03.17.
+ * Created by egor on 03.04.17.
  */
 
 @SpringBootTest(classes = Application.class)
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-public class UpdateUserInfo {
-
+public class UpdateUserLoginTest {
     @Autowired
     private MockMvc mockMvc;
     private Faker faker;
@@ -51,7 +50,7 @@ public class UpdateUserInfo {
     }
 
     @Test
-    public void updateUserInfoOk() throws Exception {
+    public void updateUserLoginOk() throws Exception {
 
         mockMvc
                 .perform(
@@ -67,18 +66,11 @@ public class UpdateUserInfo {
                                 .content(json.toString()))
                 .andExpect(jsonPath("status").value("200 OK"));
 
-        json.put("login", userLogin);
-        json.put("rating", 5);
-        json.put("game_count", 10);
-        json.put("game_count_win", 5);
-        json.put("crystal_green", 10);
-        json.put("crystal_blue", 10);
-        json.put("crystal_red", 12);
-        json.put("crystal_purple", 12);
+        json.put("newlogin", userLogin+"newLogin");
 
         mockMvc.
                 perform(
-                        post("/api/user/updateinfo")
+                        post("/api/user/update")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json.toString())
                                 .sessionAttr("user", userLogin))
@@ -87,7 +79,7 @@ public class UpdateUserInfo {
     }
 
     @Test
-    public void updateUserInfoFail() throws Exception {
+    public void updateUserLoginFail() throws Exception {
 
         mockMvc
                 .perform(
@@ -103,24 +95,17 @@ public class UpdateUserInfo {
                                 .content(json.toString()))
                 .andExpect(jsonPath("status").value("200 OK"));
 
-        json.put("login", userLogin+"lorem");
-        json.put("rating", 5);
-        json.put("game_count", 10);
-        json.put("game_count_win", 5);
-        json.put("crystal_green", 10);
-        json.put("crystal_blue", 10);
-        json.put("crystal_red", 12);
-        json.put("crystal_purple", 12);
+
+        json.put("login", userLogin+"oldLogin");
+        json.put("newlogin", userLogin+"newLogin");
 
         mockMvc.
                 perform(
-                        post("/api/user/updateinfo")
+                        post("/api/user/update")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json.toString())
                                 .sessionAttr("user", userLogin))
                 .andExpect(jsonPath("status").value("400 Bad Request"));
 
     }
-
-
 }
